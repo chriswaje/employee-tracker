@@ -19,21 +19,24 @@ const init = function () {
             ],
         },
     ])
-    .then(({ home }) => {
-        if (home === 'View all departments') {
-            viewDepartments()
-        } else if (home === 'View all roles') {
-            viewRoles()
-        } else if (home === 'View all employees') {
-            viewEmployees()
-        } else if (home === 'Add a department') {
-
-        }
-    })
+        .then(({ home }) => {
+            if (home === 'View all departments') {
+                viewDepartments()
+            } else if (home === 'View all roles') {
+                viewRoles()
+            } else if (home === 'View all employees') {
+                viewEmployees()
+            } else if (home === 'Add a department') {
+                addDepartment()
+            }
+        })
 };
 
 function viewDepartments() {
     db.query('SELECT * FROM departments', (err, res) => {
+        if (err) {
+            console.log(err)
+        };
         console.table(res);
         init()
     })
@@ -41,6 +44,9 @@ function viewDepartments() {
 
 function viewRoles() {
     db.query('SELECT roles.id, roles.title, roles.salary, departments.name AS department FROM roles LEFT JOIN departments ON roles.department_id = departments.id', (err, res) => {
+        if (err) {
+            console.log(err)
+        };
         console.table(res);
         init();
     });
@@ -56,6 +62,22 @@ function viewEmployees() {
     });
 };
 
+async function addDepartment() {
+    const { department } = await prompt([
+        {
+            type: "input",
+            name: "department",
+            message: "What is the name of the department?"
+        },
+    ]);
+    db.query(`INSERT INTO departments(name) VALUES (?)`, [department], (err) => {
+        if (err) {
+            console.log(err)
+        };
+        console.log('New department added to database');
+        init();
+    });
+};
 
 
 init();
