@@ -1,8 +1,0 @@
-const { prompt } = require('inquirer');
-const [ homeQuestions ] = require('./utils/questions');
-
-const init = function () {
-    prompt(homeQuestions())
-};
-
-init();
