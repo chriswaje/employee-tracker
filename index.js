@@ -16,7 +16,7 @@ const init = function () {
                 'Add a department',
                 'Add a role',
                 'Add an employee',
-                'Update and employee role',
+                'Update an employee role',
                 'Quit',
             ],
         },
@@ -34,6 +34,10 @@ const init = function () {
                 addRole()
             } else if (home === 'Add an employee') {
                 addEmployee()
+            } else if (home === 'Update an employee role') {
+                updateEmployeeRole()
+            } else {
+                db.end()
             }
         })
 };
@@ -116,7 +120,8 @@ async function addRole() {
 
 async function addEmployee() {
     const roles = await db.query("SELECT id AS value, title AS name FROM roles");
-    const managers = await db.query("SELECT manager_id AS value, first_name last_name AS name FROM employees");
+    let managers = await db.query("SELECT id AS value, CONCAT(first_name, ' ', last_name) AS name FROM employees");
+    managers = [{ name: 'No Manager', value: null }, ...managers];
     const { first_name, last_name, employee_role, employee_manager } = await prompt([
         {
             type: "input",
@@ -138,18 +143,35 @@ async function addEmployee() {
             type: "list",
             name: "employee_manager",
             message: "Who is the employee's manager?",
-            choices: managers || "Null"
+            choices: managers
         }
     ]);
     await db.query(`INSERT INTO employees (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)`, [first_name, last_name, employee_role, employee_manager], (err) => {
-        if (err) {
-            console.log(err)
-        };
         console.log('New employee added to database');
         init();
     });
- 
 };
 
+async function updateEmployeeRole() {
+    const roles = await db.query("SELECT id AS value, title AS name FROM roles");
+    let employees = await db.query("SELECT id AS value, CONCAT(first_name, ' ', last_name) AS name FROM employees");
+    const { employee, new_role } = await prompt([
+        {
+            type: "list",
+            name: "employee",
+            message: "Which employee would you like to update?",
+            choices: employees
+        },
+        {
+            type: "list",
+            name: "new_role",
+            message: "What role would you like to assign?",
+            choices: roles
+        }
+    ]);
+    await db.query('UPDATE employees SET role_id = ? WHERE id = ?', [new_role, employee],)
+    console.log('Employee is now updated');
+    init();
+};
 
 init();
