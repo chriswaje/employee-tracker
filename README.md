@@ -25,6 +25,7 @@ MySQL for the open-source relational database management system. Inquirer for th
 
 https://github.com/chriswaje/employee-tracker (Link to employee database)
 
+https://drive.google.com/file/d/1lFVMsmiZbwlhkChUakxE9tIMs8XoyYoe/view?usp=sharing (Link to demo video)
 
 ## Image(s)
 
